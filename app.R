@@ -1,4 +1,5 @@
 library(shiny)
+library(dplyr)
 source("utils.R")
 
 dfLocation <- "studyList.rds"
@@ -25,7 +26,10 @@ ui <- fluidPage(
 
 server <- function(input, output) {
     output$studyData <- DT::renderDataTable({
-        dplyr::select(studyData, c("path", "url", "description", "studyUrl", "updated"))
+      DT::datatable(studyData %>%
+                      dplyr::select(c("path", "url", "description", "studyUrl", "updated")) %>%
+                      dplyr::mutate(across(c("url", "studyUrl"), function(x) ifelse(x == "", "", paste0("<a href='", x,"'>", x,"</a>")))),
+                    escape = FALSE)
     })
 }
 
